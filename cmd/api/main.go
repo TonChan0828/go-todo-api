@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/TonChan0828/go-todo-api/internal/handler"
+	"github.com/TonChan0828/go-todo-api/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +17,8 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
-	todoHandler := handler.NewTodoHandler(nil)
+	todoUC := usecase.NewInMemoryTodoUsecase()
+	todoHandler := handler.NewTodoHandler(todoUC)
 	handler.RegisterTodoRoutes(r, todoHandler)
 
 	r.Run(":8080")

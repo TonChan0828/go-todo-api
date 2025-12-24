@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/TonChan0828/go-todo-api/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -14,9 +16,28 @@ func NewTodoHandler(uc usecase.TodoUsecase) *TodoHandler {
 }
 
 func (h *TodoHandler) Create(c *gin.Context) {
-	panic("not implemented")
+	var req struct {
+		Title string `json:"title" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	todo, err := h.uc.Create(c.Request.Context(), req.Title)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, todo)
 }
 
 func (h *TodoHandler) List(c *gin.Context) {
-	panic("not implemented")
+	todos, err := h.uc.List(c.Request.Context())
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, todos)
 }
