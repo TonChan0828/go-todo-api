@@ -41,3 +41,34 @@ func (h *TodoHandler) List(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, todos)
 }
+
+func (h *TodoHandler) UpdateCompleted(c *gin.Context) {
+	id := c.Param("id")
+
+	var req struct {
+		Completed bool `json:"completed"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	todo, err := h.uc.UpdateCompleted(c.Request.Context(), id, req.Completed)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, todo)
+}
+
+func (h *TodoHandler) Delete(c *gin.Context) {
+	id := c.Param("id")
+
+	if err := h.uc.Delete(c.Request.Context(), id); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}

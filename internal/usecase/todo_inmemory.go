@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"errors"
 	"sync"
 	"time"
 
@@ -45,4 +46,41 @@ func (u *InMemoryTodoUsecase) List(ctx context.Context) ([]*domain.Todo, error) 
 	out := make([]*domain.Todo, len(u.todos))
 	copy(out, u.todos)
 	return out, nil
+}
+
+func (u *InMemoryTodoUsecase) UpdateCompleted(ctx context.Context, id string, completed bool) (*domain.Todo, error) {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, t := range u.todos {
+		if t.ID == uid {
+			t.Completed = completed
+			t.UpdatedAt = time.Now()
+			return t, nil
+		}
+	}
+	return nil, errors.New("todo not found")
+}
+
+func (u *InMemoryTodoUsecase) Delete(ctx context.Context, id string) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return err
+	}
+
+	for i, t := range u.todos {
+		if t.ID == uid {
+			u.todos = append(u.todos[:i], u.todos[i+1:]...)
+			return nil
+		}
+	}
+	return errors.New("todo not found")
 }

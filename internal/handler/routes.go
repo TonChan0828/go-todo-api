@@ -7,5 +7,7 @@ func RegisterTodoRoutes(r *gin.Engine, h *TodoHandler) {
 	{
 		todos.POST("", h.Create)
 		todos.GET("", h.List)
+		todos.PUT("/:id", h.UpdateCompleted)
+		todos.DELETE("/:id", h.Delete)
 	}
 }
