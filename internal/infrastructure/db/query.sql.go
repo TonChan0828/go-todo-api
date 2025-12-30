@@ -7,7 +7,42 @@ package db
 
 import (
 	"context"
+	"time"
+
+	"github.com/google/uuid"
 )
+
+const createTodo = `-- name: CreateTodo :exec
+INSERT INTO todos (id, title, completed, created_at, updated_at) VALUES ($1, $2, $3, $4, $5)
+`
+
+type CreateTodoParams struct {
+	ID        uuid.UUID
+	Title     string
+	Completed bool
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+func (q *Queries) CreateTodo(ctx context.Context, arg CreateTodoParams) error {
+	_, err := q.db.ExecContext(ctx, createTodo,
+		arg.ID,
+		arg.Title,
+		arg.Completed,
+		arg.CreatedAt,
+		arg.UpdatedAt,
+	)
+	return err
+}
+
+const deleteTodo = `-- name: DeleteTodo :exec
+DELETE FROM todos WHERE id = $1
+`
+
+func (q *Queries) DeleteTodo(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, deleteTodo, id)
+	return err
+}
 
 const listTodos = `-- name: ListTodos :many
 SELECT id, title, completed, created_at, updated_at
@@ -42,4 +77,20 @@ func (q *Queries) ListTodos(ctx context.Context) ([]Todo, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const updateTodoCompleted = `-- name: UpdateTodoCompleted :exec
+UPDATE todos
+SET completed = $2, updated_at = NOW()
+WHERE id = $1
+`
+
+type UpdateTodoCompletedParams struct {
+	ID        uuid.UUID
+	Completed bool
+}
+
+func (q *Queries) UpdateTodoCompleted(ctx context.Context, arg UpdateTodoCompletedParams) error {
+	_, err := q.db.ExecContext(ctx, updateTodoCompleted, arg.ID, arg.Completed)
+	return err
 }
