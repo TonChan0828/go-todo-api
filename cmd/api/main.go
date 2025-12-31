@@ -1,9 +1,12 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/TonChan0828/go-todo-api/internal/handler"
+	"github.com/TonChan0828/go-todo-api/internal/infrastructure/db"
+	"github.com/TonChan0828/go-todo-api/internal/repository"
 	"github.com/TonChan0828/go-todo-api/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -17,7 +20,16 @@ func main() {
 		c.JSON(http.StatusOK, gin.H{"status": "ok"})
 	})
 
-	todoUC := usecase.NewInMemoryTodoUsecase()
+	// todoUC := usecase.NewInMemoryTodoUsecase()
+
+	sqlDB, err := db.OpenPostgres()
+	if err != nil {
+		log.Fatal(err)
+	}
+	q := db.New(sqlDB)
+	todoRepo := repository.NewPostgresTodoRepository(q)
+	todoUC := usecase.NewRepoTodoUsecase(todoRepo)
+
 	todoHandler := handler.NewTodoHandler(todoUC)
 	handler.RegisterTodoRoutes(r, todoHandler)
 
