@@ -44,6 +44,25 @@ func (q *Queries) DeleteTodo(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getTodoByID = `-- name: GetTodoByID :one
+SELECT id, title, completed, created_at, updated_at
+FROM todos
+WHERE id = $1
+`
+
+func (q *Queries) GetTodoByID(ctx context.Context, id uuid.UUID) (Todo, error) {
+	row := q.db.QueryRowContext(ctx, getTodoByID, id)
+	var i Todo
+	err := row.Scan(
+		&i.ID,
+		&i.Title,
+		&i.Completed,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const listTodos = `-- name: ListTodos :many
 SELECT id, title, completed, created_at, updated_at
 FROM todos

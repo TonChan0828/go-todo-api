@@ -65,3 +65,23 @@ func (r *PostgresTodoRepository) Delete(ctx context.Context, id string) error {
 
 	return r.q.DeleteTodo(ctx, uid)
 }
+
+func (r *PostgresTodoRepository) GetByID(ctx context.Context, id string) (*domain.Todo, error) {
+	uid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, err
+	}
+
+	row, err := r.q.GetTodoByID(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.Todo{
+		ID:        row.ID,
+		Title:     row.Title,
+		Completed: row.Completed,
+		CreatedAt: row.CreatedAt,
+		UpdatedAt: row.UpdatedAt,
+	}, nil
+}

@@ -46,17 +46,7 @@ func (u *RepoTodoUsecase) UpdateCompleted(ctx context.Context, id string, comple
 		return nil, err
 	}
 
-	todos, err := u.repo.List(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, t := range todos {
-		if t.ID.String() == id {
-			return t, nil
-		}
-	}
-	return nil, errors.New("todo not found")
+	return u.repo.GetByID(ctx, id)
 }
 
 func (u *RepoTodoUsecase) Delete(ctx context.Context, id string) error {

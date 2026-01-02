@@ -13,3 +13,8 @@ WHERE id = $1;
 
 -- name: DeleteTodo :exec
 DELETE FROM todos WHERE id = $1;
+
+-- name: GetTodoByID :one
+SELECT id, title, completed, created_at, updated_at
+FROM todos
+WHERE id = $1;
