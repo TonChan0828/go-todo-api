@@ -1,27 +1,32 @@
 # go-todo-api
 Go と Gin による RESTful な Todo API。
 
-## Overview
+## 概要
 - レイヤードアーキテクチャに基づき、責務分離とテスト容易性を重視した構成
-- フレームワーク非依存のユースケース層と、HTTP ハンドラー層を分離
-- 永続化はインメモリ実装で、差し替えを想定した設計
+- HTTP ハンドラーとユースケースを分離し、データアクセスはリポジトリ経由で実装
+- 永続化は PostgreSQL を使用し、sqlc でクエリコードを生成
+- In-memory 実装もあり、用途に応じて差し替え可能
 
-## Features
+## 機能
 - Todo の作成、一覧取得、完了状態の更新、削除
 - UUID による ID 管理
 - バリデーションとエラーハンドリング
 
-## Architecture
-- 依存方向は内向きのみ: Handler → Usecase → Domain
+## アーキテクチャ
+- 依存方向は内向きのみ: Handler → Usecase → Repository → DB
 - Handler: Gin を用いた HTTP 入出力とルーティング
 - Usecase: アプリケーションロジック、データ操作、エラー制御
-- Domain: ビジネスモデル
+- Repository: 永続化の抽象化と実装（PostgreSQL / In-memory）
+- DB: sqlc によるクエリ生成コード
 
-## Project Structure
+## プロジェクト構成
 ```
 cmd/
   api/
     main.go
+db/
+  schema.sql
+  query.sql
 internal/
   domain/
     todo.go
@@ -29,31 +34,51 @@ internal/
     routes.go
     todo_handler.go
     todo_handler_test.go
+  infrastructure/
+    todo_repository.go
+    db/
+      conn.go
+      query.sql.go
+  repository/
+    todo_postgres.go
+    todo_postgres_test.go
+    test_helper.go
   usecase/
     todo_usecase.go
+    todo_repo_usecase.go
     todo_inmemory.go
     todo_inmemory_test.go
-  repository/
-  infrastructure/
-    db/
 ```
 
-## API Endpoints
+## API エンドポイント
 - `GET /health` ヘルスチェック
 - `POST /todos` Todo 作成
 - `GET /todos` Todo 一覧取得
 - `PUT /todos/:id` 完了状態の更新
 - `DELETE /todos/:id` Todo 削除
 
-## How to Run
+## セットアップ
+### PostgreSQL を起動
+```
+docker-compose up -d
+```
+
+### 環境変数（任意）
+```
+export DATABASE_URL=postgres://todo:todo@localhost:5432/todo?sslmode=disable
+```
+
+## 起動方法
 ```
 go run ./cmd/api
 ```
 - サーバーは `:8080` で起動
+- In-memory 実装を使う場合は `cmd/api/main.go` の `NewInMemoryTodoUsecase()` を有効化
 
-## Testing
+## テスト
 ```
 go test ./...
 ```
 - ユースケース層のユニットテスト
 - `net/http/httptest` を用いた HTTP ハンドラーのテスト
+- PostgreSQL を使うリポジトリテストも含まれるため、DB が必要
