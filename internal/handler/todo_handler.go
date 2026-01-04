@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 
+	"github.com/TonChan0828/go-todo-api/internal/handler/dto"
 	"github.com/TonChan0828/go-todo-api/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
@@ -15,10 +16,19 @@ func NewTodoHandler(uc usecase.TodoUsecase) *TodoHandler {
 	return &TodoHandler{uc: uc}
 }
 
+// CreateTodo godoc
+// @Summary      Create a todo
+// @Description Create a new todo
+// @Tags         todos
+// @Accept       json
+// @Produce      json
+// @Param        todo  body  dto.CreateTodoRequest  true  "Todo request"
+// @Success      201   {object}  dto.TodoResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
+// @Router       /todos [post]
 func (h *TodoHandler) Create(c *gin.Context) {
-	var req struct {
-		Title string `json:"title" binding:"required"`
-	}
+	var req dto.CreateTodoRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -30,7 +40,15 @@ func (h *TodoHandler) Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, todo)
+	res := dto.TodoResponse{
+		ID:        todo.ID.String(),
+		Title:     todo.Title,
+		Completed: todo.Completed,
+		CreatedAt: todo.CreatedAt,
+		UpdatedAt: todo.UpdatedAt,
+	}
+
+	c.JSON(http.StatusCreated, res)
 }
 
 func (h *TodoHandler) List(c *gin.Context) {
