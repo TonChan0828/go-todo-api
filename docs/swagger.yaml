@@ -12,6 +12,13 @@ definitions:
         example: invalid request
         type: string
     type: object
+  dto.TodoListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.TodoResponse'
+        type: array
+    type: object
   dto.TodoResponse:
     properties:
       completed:
@@ -28,6 +35,8 @@ definitions:
       updated_at:
         type: string
     type: object
+  dto.UpdateTodoRequest:
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -36,6 +45,22 @@ info:
   version: "1.0"
 paths:
   /todos:
+    get:
+      description: Get all todos
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TodoListResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: List todos
+      tags:
+      - todos
     post:
       consumes:
       - application/json
@@ -63,6 +88,67 @@ paths:
           schema:
             $ref: '#/definitions/dto.ErrorResponse'
       summary: Create a todo
+      tags:
+      - todos
+  /todos/{id}:
+    delete:
+      description: Delete a todo by ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Delete a todo
+      tags:
+      - todos
+    put:
+      consumes:
+      - application/json
+      description: Update completed status of a todo
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update todo
+        in: body
+        name: todo
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateTodoRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.TodoResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorResponse'
+      summary: Update todo completion
       tags:
       - todos
 swagger: "2.0"

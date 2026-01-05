@@ -51,6 +51,14 @@ func (h *TodoHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, res)
 }
 
+// ListTodos godoc
+// @Summary      List todos
+// @Description Get all todos
+// @Tags         todos
+// @Produce      json
+// @Success      200  {object}  dto.TodoListResponse
+// @Failure      500  {object}  dto.ErrorResponse
+// @Router       /todos [get]
 func (h *TodoHandler) List(c *gin.Context) {
 	todos, err := h.uc.List(c.Request.Context())
 	if err != nil {
@@ -60,6 +68,19 @@ func (h *TodoHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, todos)
 }
 
+// UpdateTodo godoc
+// @Summary      Update todo completion
+// @Description Update completed status of a todo
+// @Tags         todos
+// @Accept       json
+// @Produce      json
+// @Param        id    path   string                 true  "Todo ID"
+// @Param        todo  body   dto.UpdateTodoRequest  true  "Update todo"
+// @Success      200   {object}  dto.TodoResponse
+// @Failure      400   {object}  dto.ErrorResponse
+// @Failure      404   {object}  dto.ErrorResponse
+// @Failure      500   {object}  dto.ErrorResponse
+// @Router       /todos/{id} [put]
 func (h *TodoHandler) UpdateCompleted(c *gin.Context) {
 	id := c.Param("id")
 
@@ -80,6 +101,15 @@ func (h *TodoHandler) UpdateCompleted(c *gin.Context) {
 	c.JSON(http.StatusOK, todo)
 }
 
+// DeleteTodo godoc
+// @Summary      Delete a todo
+// @Description Delete a todo by ID
+// @Tags         todos
+// @Param        id  path  string  true  "Todo ID"
+// @Success      204
+// @Failure      404  {object}  dto.ErrorResponse
+// @Failure      500  {object}  dto.ErrorResponse
+// @Router       /todos/{id} [delete]
 func (h *TodoHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
