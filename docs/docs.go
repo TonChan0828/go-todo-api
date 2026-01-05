@@ -241,7 +241,7 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
 	Host:             "localhost:8080",
-	BasePath:         "/",
+	BasePath:         "/v1",
 	Schemes:          []string{},
 	Title:            "Go Todo API",
 	Description:      "This is a simple todo API server built with Go and Gin.",

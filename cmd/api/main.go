@@ -4,13 +4,13 @@ package main
 // @version 1.0
 // @description This is a simple todo API server built with Go and Gin.
 // @host localhost:8080
-// @BasePath /
+// @BasePath /v1
 
 import (
 	"log"
 	"net/http"
 
-	"github.com/TonChan0828/go-todo-api/internal/handler"
+	v1handler "github.com/TonChan0828/go-todo-api/internal/handler/v1"
 	"github.com/TonChan0828/go-todo-api/internal/infrastructure/db"
 	"github.com/TonChan0828/go-todo-api/internal/repository"
 	"github.com/TonChan0828/go-todo-api/internal/usecase"
@@ -42,8 +42,10 @@ func main() {
 	todoRepo := repository.NewPostgresTodoRepository(q)
 	todoUC := usecase.NewRepoTodoUsecase(todoRepo)
 
-	todoHandler := handler.NewTodoHandler(todoUC)
-	handler.RegisterTodoRoutes(r, todoHandler)
+	// ======v1 Group ======
+	v1 := r.Group("/v1")
+	todoHandler := v1handler.NewTodoHandler(todoUC)
+	v1handler.RegisterTodoRoutes(v1, todoHandler)
 
 	r.Run(":8080")
 }

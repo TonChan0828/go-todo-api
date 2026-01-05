@@ -1,9 +1,9 @@
-package handler
+package v1
 
 import (
 	"net/http"
 
-	"github.com/TonChan0828/go-todo-api/internal/handler/dto"
+	"github.com/TonChan0828/go-todo-api/internal/handler/v1/dto"
 	"github.com/TonChan0828/go-todo-api/internal/usecase"
 	"github.com/gin-gonic/gin"
 )
