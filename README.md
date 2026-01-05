@@ -14,7 +14,7 @@ Go と Gin による RESTful な Todo API。
 
 ## アーキテクチャ
 - 依存方向は内向きのみ: Handler → Usecase → Repository → DB
-- Handler: Gin を用いた HTTP 入出力とルーティング
+- Handler: Gin を用いた HTTP 入出力とルーティング（`/v1` 配下）
 - Usecase: アプリケーションロジック、データ操作、エラー制御
 - Repository: 永続化の抽象化と実装（PostgreSQL / In-memory）
 - DB: sqlc によるクエリ生成コード
@@ -24,6 +24,10 @@ Go と Gin による RESTful な Todo API。
 cmd/
   api/
     main.go
+docs/
+  docs.go
+  swagger.json
+  swagger.yaml
 db/
   schema.sql
   query.sql
@@ -31,14 +35,24 @@ internal/
   domain/
     todo.go
   handler/
-    routes.go
-    todo_handler.go
     todo_handler_test.go
+    todo_mapper.go
+    v1/
+      routes.go
+      todo_handler.go
+      dto/
+        create_todo_request.go
+        update_todo_request.go
+        todo_response.go
+        todo_list_response.go
+        error_response.go
   infrastructure/
     todo_repository.go
     db/
       conn.go
+      db.go
       query.sql.go
+      models.go
   repository/
     todo_postgres.go
     todo_postgres_test.go
@@ -52,10 +66,11 @@ internal/
 
 ## API エンドポイント
 - `GET /health` ヘルスチェック
-- `POST /todos` Todo 作成
-- `GET /todos` Todo 一覧取得
-- `PUT /todos/:id` 完了状態の更新
-- `DELETE /todos/:id` Todo 削除
+- `GET /swagger/index.html` Swagger UI
+- `POST /v1/todos` Todo 作成
+- `GET /v1/todos` Todo 一覧取得
+- `PUT /v1/todos/:id` 完了状態の更新
+- `DELETE /v1/todos/:id` Todo 削除
 
 ## セットアップ
 ### PostgreSQL を起動
@@ -67,6 +82,7 @@ docker-compose up -d
 ```
 export DATABASE_URL=postgres://todo:todo@localhost:5432/todo?sslmode=disable
 ```
+未設定の場合は上記のデフォルト値が使用されます。
 
 ## 起動方法
 ```
