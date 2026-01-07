@@ -84,9 +84,7 @@ func (h *TodoHandler) List(c *gin.Context) {
 func (h *TodoHandler) UpdateCompleted(c *gin.Context) {
 	id := c.Param("id")
 
-	var req struct {
-		Completed bool `json:"completed"`
-	}
+	var req dto.UpdateTodoRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
