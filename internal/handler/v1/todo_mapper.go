@@ -1,11 +1,11 @@
-package handler
+package v1
 
 import (
 	"github.com/TonChan0828/go-todo-api/internal/domain"
-	"github.com/TonChan0828/go-todo-api/internal/handler/dto"
+	"github.com/TonChan0828/go-todo-api/internal/handler/v1/dto"
 )
 
-func toTOdoResponse(t *domain.Todo) dto.TodoResponse {
+func toTodoResponse(t *domain.Todo) dto.TodoResponse {
 	return dto.TodoResponse{
 		ID:        t.ID.String(),
 		Title:     t.Title,
