@@ -25,6 +25,7 @@ cmd/
   api/
     main.go
 docs/
+  BEGINNER_GUIDE.md
   docs.go
   swagger.json
   swagger.yaml
@@ -35,16 +36,14 @@ internal/
   domain/
     todo.go
   handler/
-    todo_handler_test.go
-    todo_mapper.go
     v1/
       routes.go
       todo_handler.go
+      todo_mapper.go
+      todo_handler_test.go
       dto/
-        create_todo_request.go
-        update_todo_request.go
+        todo_request.go
         todo_response.go
-        todo_list_response.go
         error_response.go
   infrastructure/
     todo_repository.go
@@ -71,6 +70,9 @@ internal/
 - `GET /v1/todos` Todo 一覧取得
 - `PUT /v1/todos/:id` 完了状態の更新
 - `DELETE /v1/todos/:id` Todo 削除
+
+## ドキュメント
+- 初学者向けガイド: `docs/BEGINNER_GUIDE.md`
 
 ## セットアップ
 ### PostgreSQL を起動
